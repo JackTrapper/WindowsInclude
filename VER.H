@@ -1,3 +1,14 @@
+/****************************************************************************
+*                                                                           *
+* THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY     *
+* KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE       *
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR     *
+* PURPOSE.                                                                  *
+*                                                                           *
+* Copyright (C) 1993-95  Microsoft Corporation.  All Rights Reserved.       *
+*                                                                           *
+****************************************************************************/
+
 /*****************************************************************************\
 *                                                                             *
 * ver.h -       Version management functions, types, and definitions          *
@@ -7,8 +18,6 @@
 *               and of special .VER files for DOS executable files.           *
 *                                                                             *
 *               The API is unchanged for LIB and DLL versions.                *
-*                                                                             *
-*               Copyright (c) 1992, Microsoft Corp.  All rights reserved      *
 *                                                                             *
 *******************************************************************************
 *
@@ -133,6 +142,7 @@ typedef int             HFILE;
 #define	VFT2_DRV_INSTALLABLE	0x00000008L
 #define	VFT2_DRV_SOUND		0x00000009L
 #define	VFT2_DRV_COMM		0x0000000AL
+#define VFT2_DRV_INPUTMETHOD    0x0000000BL
 
 /* ----- VS_VERSION.dwFileSubtype for VFT_WINDOWS_FONT ----- */
 #define VFT2_FONT_RASTER	0x00000001L
@@ -238,9 +248,13 @@ BOOL WINAPI GetFileResource(
 
 UINT WINAPI VerLanguageName(UINT wLang, LPSTR szLang, UINT nSize);
 
+#ifdef LIB
+
 UINT WINAPI GetWindowsDir(LPCSTR szAppDir, LPSTR lpBuffer, int nSize);
 
 UINT WINAPI GetSystemDir(LPCSTR szAppDir, LPSTR lpBuffer, int nSize);
+
+#endif /* LIB */
 
 BOOL WINAPI VerQueryValue(const void FAR* pBlock, LPCSTR lpSubBlock,
       void FAR* FAR* lplpBuffer, UINT FAR* lpuLen);

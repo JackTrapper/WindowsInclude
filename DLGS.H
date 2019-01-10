@@ -1,10 +1,19 @@
+/****************************************************************************
+*                                                                           *
+* THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY     *
+* KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE       *
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR     *
+* PURPOSE.                                                                  *
+*                                                                           *
+* Copyright (C) 1993-95  Microsoft Corporation.  All Rights Reserved.       *
+*                                                                           *
+****************************************************************************/
+
 /*****************************************************************************\
 *                                                                             *
 * dlgs.h -      Common dialog's dialog element ID numbers                     *
 *                                                                             *
-*               Version 1.0                                                   *
-*                                                                             *
-*               Copyright (c) 1992, Microsoft Corp.  All rights reserved.     *
+* Version 1.0								      *
 *                                                                             *
 \*****************************************************************************/
 
@@ -28,6 +37,7 @@
 #define psh12       0x040b
 #define psh13       0x040c
 #define psh14       0x040d
+#define pshNetwork  psh14
 #define psh15       0x040e
 #define pshHelp     psh15
 #define psh16       0x040f
@@ -188,5 +198,6 @@
 #define FONTDLGORD       1542
 #define FORMATDLGORD31   1543
 #define FORMATDLGORD30   1544
+#define RUNDLGORD        1545
 
 #endif  /* !_INC_DLGS */

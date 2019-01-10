@@ -1,10 +1,19 @@
+/****************************************************************************
+*                                                                           *
+* THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY     *
+* KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE       *
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR     *
+* PURPOSE.                                                                  *
+*                                                                           *
+* Copyright (C) 1993-95  Microsoft Corporation.  All Rights Reserved.       *
+*                                                                           *
+****************************************************************************/
+
 /*****************************************************************************\
 *                                                                             *
 * wfext.h -     Windows File Manager Extensions definitions		      *
 *                                                                             *
-*               Version 3.10                                                  *                   *
-*                                                                             *
-*               Copyright (c) 1991-1992, Microsoft Corp. All rights reserved. *
+* Version 3.10								      *
 *                                                                             *
 *******************************************************************************/
 
@@ -29,6 +38,8 @@ extern "C" {            /* Assume C declarations for C++ */
 #define FMEVENT_INITMENU	102
 #define FMEVENT_USER_REFRESH	103
 #define FMEVENT_SELCHANGE	104
+#define FMEVENT_TOOLBARLOAD	105
+#define FMEVENT_HELPSTRING	106
 
 #define FMFOCUS_DIR		1
 #define FMFOCUS_TREE		2
@@ -69,6 +80,33 @@ typedef struct tagFMS_LOAD
 	HMENU hMenu;				/* output */
         UINT  wMenuDelta;                       /* input */
 } FMS_LOAD, FAR *LPFMS_LOAD;
+
+typedef struct tagEXT_BUTTON
+{
+	WORD idCommand;			/* menu command to trigger */
+	WORD idsHelp;			/* help string ID */
+	WORD fsStyle;			/* button style */
+} EXT_BUTTON, FAR *LPEXT_BUTTON;
+
+#define FMTB_BUTTON	0x00
+#define FMTB_SEP	0x01
+
+typedef struct tagFMS_TOOLBARLOAD
+{
+	DWORD dwSize;			/* for version checks */
+	LPEXT_BUTTON lpButtons;		/* output */
+	WORD cButtons;			/* output, 0==>no buttons */
+	WORD cBitmaps;			/* number of non-sep buttons */
+	WORD idBitmap;			/* output */
+	HBITMAP hBitmap;		/* output if idBitmap==0 */
+} FMS_TOOLBARLOAD, FAR *LPFMS_TOOLBARLOAD;
+
+typedef struct tagFMS_HELPSTRING
+{
+	int idCommand;			/* input, -1==>the menu was selected */
+	HMENU hMenu;			/* input, the extensions menu */
+	char szHelp[128];		/* output, the help string */
+} FMS_HELPSTRING, FAR *LPFMS_HELPSTRING;
 
 typedef DWORD (CALLBACK *FM_EXT_PROC)(HWND, UINT, LONG);
 typedef DWORD (CALLBACK *FM_UNDELETE_PROC)(HWND, LPSTR);

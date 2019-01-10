@@ -1,12 +1,21 @@
+/****************************************************************************
+*                                                                           *
+* THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY     *
+* KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE       *
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR     *
+* PURPOSE.                                                                  *
+*                                                                           *
+* Copyright (C) 1993-95  Microsoft Corporation.  All Rights Reserved.       *
+*                                                                           *
+****************************************************************************/
+
 /*****************************************************************************\
 *                                                                             *
 * commdlg.h -   Common dialog functions, types, and definitions               *
 *                                                                             *
-*               Version 1.0                                                   *
+* Version 1.0								      *
 *                                                                             *
-*               NOTE: windows.h must be #included first                       *
-*                                                                             *
-*               Copyright (c) 1992, Microsoft Corp.  All rights reserved.     *
+* NOTE: windows.h must be #included first				      *
 *                                                                             *
 \*****************************************************************************/
 
@@ -19,22 +28,9 @@
 
 #ifdef __cplusplus
 extern "C" {            /* Assume C declarations for C++ */
-#endif	/* __cplusplus */
+#endif  /* __cplusplus */
 
-#ifndef WINAPI          /* If not included with 3.1 headers... */
-#define WINAPI      FAR PASCAL
-#define CALLBACK    FAR PASCAL
-#define LPCSTR      LPSTR
-#define UINT        WORD
-#define LPARAM      LONG
-#define WPARAM      WORD
-#define LRESULT     LONG
-#define HMODULE     HANDLE
-#define HINSTANCE   HANDLE
-#define HLOCAL      HANDLE
-#define HGLOBAL     HANDLE
-#endif  /* _INC_WINDOWS */
-
+//---------------------------------------------------------------------------
 typedef struct tagOFN
 {
     DWORD   lStructSize;
@@ -81,6 +77,13 @@ int     WINAPI GetFileTitle(LPCSTR, LPSTR, UINT);
 #define OFN_SHAREAWARE               0x00004000
 #define OFN_NOREADONLYRETURN         0x00008000
 #define OFN_NOTESTFILECREATE         0x00010000
+#define OFN_NONETWORKBUTTON          0x00020000
+#define OFN_NOLONGNAMES              0x00040000		// force no long names for 4.x modules
+#if (WINVER >= 0x400)
+#define OFN_EXPLORER                 0x00080000
+#define OFN_NODEREFERENCELINKS       0x00100000
+#define OFN_LONGNAMES		     0x00200000		// force long names for 3.x modules
+#endif  /* WINVER >= 0x400 */
 
 /* Return values for the registered message sent to the hook function
  * when a sharing violation occurs.  OFN_SHAREFALLTHROUGH allows the
@@ -97,11 +100,12 @@ int     WINAPI GetFileTitle(LPCSTR, LPSTR, UINT);
 #define OFN_SHARENOWARN          1
 #define OFN_SHAREWARN            0
 
+//---------------------------------------------------------------------------
 typedef struct tagCHOOSECOLOR
 {
     DWORD   lStructSize;
     HWND    hwndOwner;
-    HWND    hInstance;
+    HINSTANCE hInstance;
     COLORREF rgbResult;
     COLORREF FAR* lpCustColors;
     DWORD   Flags;
@@ -120,7 +124,13 @@ BOOL    WINAPI ChooseColor(CHOOSECOLOR FAR*);
 #define CC_ENABLEHOOK            0x00000010
 #define CC_ENABLETEMPLATE        0x00000020
 #define CC_ENABLETEMPLATEHANDLE  0x00000040
+#if (WINVER >= 0x400)
+#define CC_SOLIDCOLOR            0x00000080
+#define CC_ANYCOLOR              0x00000100
+#endif  /* WINVER >= 0x400 */
+//// reserved                    0x?0000000
 
+//---------------------------------------------------------------------------
 typedef struct tagFINDREPLACE
 {
     DWORD    lStructSize;            /* size of this struct 0x20 */
@@ -140,93 +150,99 @@ typedef struct tagFINDREPLACE
 } FINDREPLACE;
 typedef FINDREPLACE FAR *LPFINDREPLACE;
 
-#define FR_DOWN 			0x00000001
-#define FR_WHOLEWORD			0x00000002
-#define FR_MATCHCASE			0x00000004
-#define FR_FINDNEXT			0x00000008
-#define FR_REPLACE			0x00000010
-#define FR_REPLACEALL			0x00000020
-#define FR_DIALOGTERM			0x00000040
-#define FR_SHOWHELP			0x00000080
-#define FR_ENABLEHOOK			0x00000100
-#define FR_ENABLETEMPLATE		0x00000200
-#define FR_NOUPDOWN			0x00000400
-#define FR_NOMATCHCASE			0x00000800
-#define FR_NOWHOLEWORD			0x00001000
-#define FR_ENABLETEMPLATEHANDLE 	0x00002000
-#define FR_HIDEUPDOWN			0x00004000
-#define FR_HIDEMATCHCASE		0x00008000
-#define FR_HIDEWHOLEWORD		0x00010000
+#define FR_DOWN                         0x00000001
+#define FR_WHOLEWORD                    0x00000002
+#define FR_MATCHCASE                    0x00000004
+#define FR_FINDNEXT                     0x00000008
+#define FR_REPLACE                      0x00000010
+#define FR_REPLACEALL                   0x00000020
+#define FR_DIALOGTERM                   0x00000040
+#define FR_SHOWHELP                     0x00000080
+#define FR_ENABLEHOOK                   0x00000100
+#define FR_ENABLETEMPLATE               0x00000200
+#define FR_NOUPDOWN                     0x00000400
+#define FR_NOMATCHCASE                  0x00000800
+#define FR_NOWHOLEWORD                  0x00001000
+#define FR_ENABLETEMPLATEHANDLE         0x00002000
+#define FR_HIDEUPDOWN                   0x00004000
+#define FR_HIDEMATCHCASE                0x00008000
+#define FR_HIDEWHOLEWORD                0x00010000
+/// 0x?0000000 is reserved for internal use
 
 HWND    WINAPI FindText(FINDREPLACE FAR*);
 HWND    WINAPI ReplaceText(FINDREPLACE FAR*);
 
+//---------------------------------------------------------------------------
 typedef struct tagCHOOSEFONT
 {
-    DWORD	    lStructSize;	/* */
-    HWND	    hwndOwner;		/* caller's window handle   */
-    HDC 	    hDC;		/* printer DC/IC or NULL    */
+    DWORD           lStructSize;        /* */
+    HWND            hwndOwner;          /* caller's window handle   */
+    HDC             hDC;                /* printer DC/IC or NULL    */
     LOGFONT FAR*    lpLogFont;          /* ptr. to a LOGFONT struct */
-    int		    iPointSize;		/* 10 * size in points of selected font */
-    DWORD	    Flags;		/* enum. type flags	    */
+    int             iPointSize;         /* 10 * size in points of selected font */
+    DWORD           Flags;              /* enum. type flags         */
     COLORREF        rgbColors;          /* returned text color      */
     LPARAM          lCustData;          /* data passed to hook fn.  */
     UINT (CALLBACK* lpfnHook)(HWND, UINT, WPARAM, LPARAM);
-					/* ptr. to hook function    */
+                                        /* ptr. to hook function    */
     LPCSTR          lpTemplateName;     /* custom template name     */
     HINSTANCE       hInstance;          /* instance handle of.EXE that
-					 * contains cust. dlg. template
-					 */
-    LPSTR	    lpszStyle;		/* return the style field here 
-					 * must be LF_FACESIZE or bigger */
+                                         * contains cust. dlg. template
+                                         */
+    LPSTR           lpszStyle;          /* return the style field here
+                                         * must be LF_FACESIZE or bigger */
     UINT            nFontType;          /* same value reported to the EnumFonts
-					 * call back with the extra FONTTYPE_ 
-					 * bits added */
-    int		    nSizeMin;		/* minimum pt size allowed & */
-    int		    nSizeMax;		/* max pt size allowed if    */
-					/* CF_LIMITSIZE is used      */
+                                         * call back with the extra FONTTYPE_
+                                         * bits added */
+    int             nSizeMin;           /* minimum pt size allowed & */
+    int             nSizeMax;           /* max pt size allowed if    */
+                                        /* CF_LIMITSIZE is used      */
 } CHOOSEFONT;
 typedef CHOOSEFONT FAR *LPCHOOSEFONT;
 
 BOOL WINAPI ChooseFont(CHOOSEFONT FAR*);
 
-#define CF_SCREENFONTS		     0x00000001
-#define CF_PRINTERFONTS 	     0x00000002
-#define CF_BOTH 		     (CF_SCREENFONTS | CF_PRINTERFONTS)
-#define CF_SHOWHELP		     0x00000004L
-#define CF_ENABLEHOOK		     0x00000008L
-#define CF_ENABLETEMPLATE	     0x00000010L
+#define CF_SCREENFONTS               0x00000001
+#define CF_PRINTERFONTS              0x00000002
+#define CF_BOTH                      (CF_SCREENFONTS | CF_PRINTERFONTS)
+#define CF_SHOWHELP                  0x00000004L
+#define CF_ENABLEHOOK                0x00000008L
+#define CF_ENABLETEMPLATE            0x00000010L
 #define CF_ENABLETEMPLATEHANDLE      0x00000020L
 #define CF_INITTOLOGFONTSTRUCT       0x00000040L
-#define CF_USESTYLE		     0x00000080L
-#define CF_EFFECTS		     0x00000100L
-#define CF_APPLY		     0x00000200L
-#define CF_ANSIONLY		     0x00000400L
-#define CF_NOVECTORFONTS	     0x00000800L
-#define CF_NOOEMFONTS		     CF_NOVECTORFONTS
-#define CF_NOSIMULATIONS	     0x00001000L
-#define CF_LIMITSIZE		     0x00002000L
-#define CF_FIXEDPITCHONLY	     0x00004000L
-#define CF_WYSIWYG		     0x00008000L /* must also have CF_SCREENFONTS & CF_PRINTERFONTS */
-#define CF_FORCEFONTEXIST	     0x00010000L
-#define CF_SCALABLEONLY		     0x00020000L
-#define CF_TTONLY		     0x00040000L
-#define CF_NOFACESEL		     0x00080000L
-#define CF_NOSTYLESEL		     0x00100000L
-#define CF_NOSIZESEL		     0x00200000L
+#define CF_USESTYLE                  0x00000080L
+#define CF_EFFECTS                   0x00000100L
+#define CF_APPLY                     0x00000200L
+#define CF_SCRIPTSONLY					 0x00000400L	
+#define CF_ANSIONLY                  CF_SCRIPTSONLY
+#define CF_NOVECTORFONTS             0x00000800L
+#define CF_NOOEMFONTS                CF_NOVECTORFONTS
+#define CF_NOSIMULATIONS             0x00001000L
+#define CF_LIMITSIZE                 0x00002000L
+#define CF_FIXEDPITCHONLY            0x00004000L
+#define CF_WYSIWYG                   0x00008000L /* must also have CF_SCREENFONTS & CF_PRINTERFONTS */
+#define CF_FORCEFONTEXIST            0x00010000L
+#define CF_SCALABLEONLY              0x00020000L
+#define CF_TTONLY                    0x00040000L
+#define CF_NOFACESEL                 0x00080000L
+#define CF_NOSTYLESEL                0x00100000L
+#define CF_NOSIZESEL                 0x00200000L
+#define CF_SELECTSCRIPT					 0x00400000L
+#define CF_NOSCRIPTSEL					 0x00800000L
+#define CF_NOVERTFONTS               0x01000000L
+/////  reserved for internal use     0x?0000000L
 
 /* these are extra nFontType bits that are added to what is returned to the
  * EnumFonts callback routine */
 
-#define SIMULATED_FONTTYPE	0x8000
-#define PRINTER_FONTTYPE	0x4000
-#define SCREEN_FONTTYPE		0x2000
-#define BOLD_FONTTYPE		0x0100
-#define ITALIC_FONTTYPE		0x0200
-#define REGULAR_FONTTYPE	0x0400
+#define SIMULATED_FONTTYPE      0x8000
+#define PRINTER_FONTTYPE        0x4000
+#define SCREEN_FONTTYPE         0x2000
+#define BOLD_FONTTYPE           0x0100
+#define ITALIC_FONTTYPE         0x0200
+#define REGULAR_FONTTYPE        0x0400
 
-#define WM_CHOOSEFONT_GETLOGFONT	(WM_USER + 1)
-
+#define WM_CHOOSEFONT_GETLOGFONT        (WM_USER + 1)  
 
 /* strings used to obtain unique window message for communication
  * between dialog and caller
@@ -245,6 +261,7 @@ BOOL WINAPI ChooseFont(CHOOSEFONT FAR*);
 #define CD_LBSELSUB      1
 #define CD_LBSELADD      2
 
+//---------------------------------------------------------------------------
 typedef struct tagPD
 {
     DWORD   lStructSize;
@@ -293,6 +310,8 @@ BOOL    WINAPI PrintDlg(PRINTDLG FAR*);
 #define PD_USEDEVMODECOPIES          0x00040000
 #define PD_DISABLEPRINTTOFILE        0x00080000
 #define PD_HIDEPRINTTOFILE           0x00100000
+#define PD_NONETWORKBUTTON           0x00200000
+////  reserved                       0x?0000000
 
 typedef struct tagDEVNAMES
 {
@@ -307,9 +326,10 @@ typedef DEVNAMES FAR* LPDEVNAMES;
 
 DWORD   WINAPI CommDlgExtendedError(void);
 
+//---------------------------------------------------------------------------
 #ifdef __cplusplus
 }
-#endif	/* __cplusplus */
+#endif  /* __cplusplus */
 
 #ifndef RC_INVOKED
 #pragma pack()

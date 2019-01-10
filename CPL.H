@@ -1,10 +1,19 @@
+/****************************************************************************
+*                                                                           *
+* THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY     *
+* KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE       *
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR     *
+* PURPOSE.                                                                  *
+*                                                                           *
+* Copyright (C) 1993-95  Microsoft Corporation.  All Rights Reserved.       *
+*                                                                           *
+****************************************************************************/
+
 /*****************************************************************************\
 *                                                                             *
 * cpl.h -       Control panel extension DLL definitions                       *
 *                                                                             *
-*               Version 3.10                                                  *
-*                                                                             *
-*               Copyright (c) 1992, Microsoft Corp.  All rights reserved      *
+* Version 3.10								      *
 *                                                                             *
 ******************************************************************************
 *  General rules for being installed in the Control Panel:
@@ -21,16 +30,8 @@
 *              ...
 *
 *
-*  The order applet DLL's are loaded by CONTROL.EXE is:
-*
-*      1) MAIN.CPL is loaded from the windows system directory.
-*
-*      2) Installable drivers that are loaded and export the
-*         CplApplet() routine.
-*
-*      3) DLL's specified in the [MMCPL] section of CONTROL.INI.
-*
-*      4) DLL's named *.CPL from windows system directory.
+*  The order applet DLL's are loaded by CONTROL.EXE is not guaranteed.
+*  Control panels may be sorted for display, etc.
 *
 */
 #ifndef _INC_CPL
@@ -68,7 +69,7 @@ extern "C" {            /* Assume C declarations for C++ */
 
 typedef LRESULT (CALLBACK *APPLET_PROC)(HWND hwndCpl, UINT msg, LPARAM lParam1, LPARAM lParam2);
 
-/* The data structure CPlApplet() must fill in. */
+/* The data structures CPlApplet() must fill in. */
 
 typedef struct tagCPLINFO
 {
@@ -90,6 +91,18 @@ typedef struct tagNEWCPLINFO
     char        szHelpFile[128];/* path to help file to use */
 } NEWCPLINFO, *PNEWCPLINFO, FAR *LPNEWCPLINFO;
 
+#define CPL_DYNAMIC_RES 0
+// This constant may be used in place of real resource IDs for the idIcon,
+// idName or idInfo members of the CPLINFO structure.  Normally, the system
+// uses these values to extract copies of the resources and store them in a
+// cache.  Once the resource information is in the cache, the system does not
+// need to load a CPL unless the user actually tries to use it.
+// CPL_DYNAMIC_RES tells the system not to cache the resource, but instead to
+// load the CPL every time it needs to display information about an item.  This
+// allows a CPL to dynamically decide what information will be displayed, but
+// is SIGNIFICANTLY SLOWER than displaying information from a cache.
+// Typically, CPL_DYNAMIC_RES is used when a control panel must inspect the
+// runtime status of some device in order to provide text or icons to display.
 
 /* The messages CPlApplet() must handle: */
 
@@ -98,28 +111,29 @@ typedef struct tagNEWCPLINFO
 /*  lParam1 and lParam2 are not defined. */
 /*  Return TRUE or FALSE indicating whether the control panel should proceed. */
 
-
 #define CPL_GETCOUNT    2
 /*  This message is sent to determine the number of applets to be displayed. */
 /*  lParam1 and lParam2 are not defined. */
 /*  Return the number of applets you wish to display in the control */
 /*  panel window. */
 
-
 #define CPL_INQUIRE     3
 /*  This message is sent for information about each applet. */
+
+/*  A CPL SHOULD HANDLE BOTH THE CPL_INQUIRE AND CPL_NEWINQUIRE MESSAGES. */
+/*  The developer must not make any assumptions about the order or dependance */
+/*  of CPL inquiries. */
+
 /*  lParam1 is the applet number to register, a value from 0 to */
 /*  (CPL_GETCOUNT - 1).  lParam2 is a far ptr to a CPLINFO structure. */
-/*  Fill in CPL_INFO's idIcon, idName, idInfo and lData fields with */
+/*  Fill in CPLINFO's idIcon, idName, idInfo and lData fields with */
 /*  the resource id for an icon to display, name and description string ids, */
-/*  and a long data item associated with applet #lParam1. */
-
+/*  and a long data item associated with applet #lParam1.  This information */
+/*  may be cached by the caller at runtime and/or across sessions. */
+/*  To prevent caching, see CPL_DYNAMIC_RES, above.  */
 
 #define CPL_SELECT      4
-/*  This message is sent when the applet's icon has been clicked upon. */
-/*  lParam1 is the applet number which was selected.  lParam2 is the */
-/*  applet's lData value. */
-
+/*  The CPL_SELECT message has been deleted. */
 
 #define CPL_DBLCLK      5
 /*  This message is sent when the applet's icon has been double-clicked */
@@ -127,24 +141,31 @@ typedef struct tagNEWCPLINFO
 /*  applet's lData value. */
 /*  This message should initiate the applet's dialog box. */
 
-
 #define CPL_STOP        6
 /*  This message is sent for each applet when the control panel is exiting. */
 /*  lParam1 is the applet number.  lParam2 is the applet's lData  value. */
 /*  Do applet specific cleaning up here. */
-
 
 #define CPL_EXIT        7
 /*  This message is sent just before the control panel calls FreeLibrary. */
 /*  lParam1 and lParam2 are not defined. */
 /*  Do non-applet specific cleaning up here. */
 
-
 #define CPL_NEWINQUIRE	8
-/* this is the same as CPL_INQUIRE execpt lParam2 is a pointer to a */
-/* NEWCPLINFO structure.  this will be sent before the CPL_INQUIRE */
-/* and if it is responed to (return != 0) CPL_INQUIRE will not be sent */
+/* Same as CPL_INQUIRE execpt lParam2 is a pointer to a NEWCPLINFO struct. */
 
+/*  A CPL SHOULD HANDLE BOTH THE CPL_INQUIRE AND CPL_NEWINQUIRE MESSAGES. */
+/*  The developer must not make any assumptions about the order or dependance */
+/*  of CPL inquiries. */
+
+#define CPL_STARTWPARMS 9
+/* this message parallels CPL_DBLCLK in that the applet should initiate 
+** its dialog box.  where it differs is that this invocation is coming
+** out of RUNDLL, and there may be some extra directions for execution.
+** lParam1: the applet number.
+** lParam2: an LPSTR to any extra directions that might exist.
+** returns: TRUE if the message was handled; FALSE if not.
+*/
 
 #ifdef __cplusplus
 }

@@ -1,12 +1,21 @@
+/****************************************************************************
+*                                                                           *
+* THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY     *
+* KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE       *
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR     *
+* PURPOSE.                                                                  *
+*                                                                           *
+* Copyright (C) 1993-95  Microsoft Corporation.  All Rights Reserved.       *
+*                                                                           *
+****************************************************************************/
+
 /*****************************************************************************\
 *                                                                             *
-* ole.h -       Object Linking and Embedding functions, types, and definitions*
+* ole.h -   Object Linking and Embedding functions, types, and definitions    *
 *                                                                             *
-*               Version 1.0                                                   *
+* Version 1.0								      *
 *                                                                             *
-*               NOTE: windows.h must be #included first                       *
-*                                                                             *
-*               Copyright (c) 1990-1992, Microsoft Corp.  All rights reserved.*
+* NOTE: windows.h must be #included first				      *
 *                                                                             *
 \*****************************************************************************/
 
