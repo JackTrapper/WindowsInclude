@@ -1,6 +1,6 @@
 comment $
 cmacros - assembly macros for interfacing to hhls
-(C)Copyright Microsoft Corp. 1984-1987
+(C)Copyright Microsoft Corp. 1984-1988
 $
 .xcref
 .xcref ??_out
@@ -52,20 +52,18 @@ endif
 ifdef ?HUGE
 memH=1
 endif
-??_out <cMacros Version 5.00 - 01/26/88>
-??_out <Copyright (C) Microsoft Corp. 1984-1988. All rights reserved.>
-outif memS,0,<Small Model>
+??_out <cMacros Version 5.20 - Copyright (c) Microsoft Corp. 1984-1988>
+outif memS,0,<Small model>
 outif memM,0,<Medium model>
-outif memL,0,<Large Model>
-outif memC,0,<Compact Model>
-outif memH,0,<Huge Model>
+outif memL,0,<Large model>
+outif memC,0,<Compact model>
+outif memH,0,<Huge model>
 memMOD= memS + memM + memL + memC + memH
 if memMOD ne 1
 if memMOD eq 0
 memS = 1
-outif memS,0,<Small model>
 else
-??error <must have only 1 memory model selected>
+??error <more than 1 memory model selected>
 endif
 endif
 sizec= memM + memL + memH
@@ -73,7 +71,11 @@ sized= memL + memC + (memH*2)
 outif ?DF,0,<No segments or groups will be defined>
 outif ?TF,0,<Epilog sequences assume valid SP>
 outif ?WIN,1,<Windows support>
+if ?WIN eq 1
+outif ?PLM,1,<>
+else
 outif ?PLM,1,<PL/M calling convention>
+endif
 ifndef ?NODATA
 ?nodata1=0
 else
