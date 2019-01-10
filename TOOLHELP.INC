@@ -1,13 +1,26 @@
+;****************************************************************************
+;                                                                           *
+; THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY     *
+; KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE       *
+; IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR     *
+; PURPOSE.                                                                  *
+;                                                                           *
+; Copyright (C) 1993-95  Microsoft Corporation.  All Rights Reserved.       *
+;                                                                           *
+;****************************************************************************
+
 ;**************************************************************************
-;*  TOOLHELP.INC
+;*  TOOLHELP.INC - toolhelp.dll functions, types, and definitions
 ;*
-;*      Assembly-language public include file for TOOLHELP.DLL
+;*	Assembly-language public include file for TOOLHELP.DLL
+;*
+;*	Version 1.0								      *
 ;*
 ;**************************************************************************
 
 ;** General symbol values
 MAX_DATA        EQU     11
-MAX_PATH        EQU     255
+MAX_PATH16      EQU     255
 MAX_MODULE_NAME EQU     8 + 1           ;Leave room for the zero and padding
 MAX_CLASSNAME   EQU     255
 
@@ -95,6 +108,7 @@ LF_MOVEABLE             EQU     4
 
 ;** LOCALENTRY.wType
 LT_NORMAL               EQU     0
+LT_FREE                 EQU     0ffh
 LT_GDI_PEN              EQU     1
 LT_GDI_BRUSH            EQU     2
 LT_GDI_FONT             EQU     3
@@ -106,7 +120,65 @@ LT_GDI_DISABLED_DC      EQU     8
 LT_GDI_METADC           EQU     9
 LT_GDI_METAFILE         EQU     10
 LT_GDI_MAX              EQU     LT_GDI_METAFILE
-LT_FREE                 EQU     0ffh
+LT_USER_CLASS           EQU     1
+LT_USER_WND             EQU     2
+LT_USER_STRING          EQU     3
+LT_USER_MENU            EQU     4
+LT_USER_CLIP            EQU     5
+LT_USER_CBOX            EQU     6
+LT_USER_PALETTE         EQU     7
+LT_USER_ED              EQU     8
+LT_USER_BWL             EQU     9
+LT_USER_OWNERDRAW       EQU     10
+LT_USER_SPB             EQU     11
+LT_USER_CHECKPOINT      EQU     12
+LT_USER_DCE             EQU     13
+LT_USER_MWP             EQU     14
+LT_USER_PROP            EQU     15
+LT_USER_LBIV            EQU     16
+LT_USER_MISC            EQU     17
+LT_USER_ATOMS           EQU     18
+LT_USER_LOCKINPUTSTATE  EQU     19
+LT_USER_HOOKLIST        EQU     20
+LT_USER_USERSEEUSERDOALLOC EQU  21
+LT_USER_HOTKEYLIST      EQU     22
+LT_USER_POPUPMENU       EQU     23
+LT_USER_ICON            EQU     24
+LT_USER_SUBSYSTEM       EQU     25
+LT_USER_QMSG            EQU     26
+LT_USER_VWININFO        EQU     27
+LT_USER_SMS             EQU     28
+LT_USER_PROCESS         EQU     29
+LT_USER_ATTACHINFO      EQU     30
+LT_USER_SYSCOLORTEMP    EQU     31
+LT_USER_HANDLETABLE     EQU     32
+LT_USER_SWITCHWNDINFO   EQU     33
+LT_USER_HOOKMSG         EQU     34
+LT_USER_MAX             EQU     34
+
+; ----- Local32 heap walking -----
+
+LOCAL32INFO     STRUC
+li32_dwSize                     DD      ?
+li32_dwMemReserved              DD      ?
+li32_dwMemCommitted             DD      ?
+li32_dwTotalFree                DD      ?
+li32_dwLargestFreeBlock         DD      ?
+li32_dwcFreeHandles             DD      ?
+LOCAL32INFO     ENDS
+
+LOCAL32ENTRY    STRUC
+le32_dwSize          DD      ?
+le32_hHandle         DW      ?
+le32_dwAddress       DD      ?
+le32_dwSizeBlock     DD      ?
+le32_wFlags          DW      ?
+le32_wType           DW      ?
+le32_hHeap           DW      ?
+le32_wHeapType       DW      ?
+le32_dwNext          DD      ?
+le32_dwNextAlt       DD      ?
+LOCAL32ENTRY    ENDS
 
 ; ----- Stack tracing -----
 
@@ -133,7 +205,7 @@ me_dwSize       DD      ?
 me_szModule     DB      MAX_MODULE_NAME + 1 DUP(?)
 me_hModule      DW      ?
 me_wcUsage      DW      ?
-me_szExePath    DB      MAX_PATH + 1 + 1 DUP(?)
+me_szExePath    DB      MAX_PATH16 + 1 + 1 DUP(?)
 me_wNext        DW      ?
 MODULEENTRY ENDS
 
@@ -193,6 +265,9 @@ si_wUserFreePercent     DW      ?
 si_wGDIFreePercent      DW      ?
 si_hUserSegment         DW      ?
 si_hGDISegment          DW      ?
+si_hWndSegment          DW      ?
+si_hMenuSegment         DW      ?
+si_hGDI32Segment        DW      ?
 SYSHEAPINFO ENDS
 
 ; ----- Notifications -----
@@ -289,4 +364,3 @@ ti_dwSize               DD      ?
 ti_dwmsSinceStart       DD      ?
 ti_dwmsThisVM           DD      ?
 TIMERINFO ENDS
-

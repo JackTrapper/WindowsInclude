@@ -1,3 +1,14 @@
+/****************************************************************************
+*                                                                           *
+* THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY     *
+* KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE       *
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR     *
+* PURPOSE.                                                                  *
+*                                                                           *
+* Copyright (C) 1993-95  Microsoft Corporation.  All Rights Reserved.       *
+*                                                                           *
+****************************************************************************/
+
 /*****************************************************************************\
 *                                                                             *
 * scrnsave.h    Windows 3.1 screensaver defines and definitions.
@@ -5,8 +16,6 @@
 *               Version 1.0                                                   *
 *                                                                             *
 *               NOTE: windows.h must be #included first                       *
-*                                                                             *
-*               Copyright (c) 1992, Microsoft Corp.  All rights reserved.     *
 *                                                                             *
 \*****************************************************************************/
 
@@ -19,22 +28,7 @@
 
 #ifdef __cplusplus
 extern "C" {            /* Assume C declarations for C++ */
-#endif	/* __cplusplus */
-
-#ifndef _INC_WINDOWS    /* If not included with 3.1 headers... */
-#define LPCSTR      LPSTR
-#define WINAPI      FAR PASCAL
-#define CALLBACK    FAR PASCAL
-#define UINT        WORD
-#define LPARAM      LONG
-#define WPARAM      WORD
-#define LRESULT     LONG
-#define HMODULE     HANDLE
-#define HINSTANCE   HANDLE
-#define HLOCAL      HANDLE
-#define HGLOBAL     HANDLE
-#endif  /* _INC_WINDOWS */
-
+#endif  /* __cplusplus */
 
 /* Icon resource ID.
  *
@@ -57,6 +51,7 @@ extern "C" {            /* Assume C declarations for C++ */
 #define idsAppName              1007
 #define idsNoHelpMemory         1008
 #define idsHelpFile             1009
+#define idsDefKeyword           1010
 
 /* This function is the Window Procedure for the screen saver.  It is
  * up to the programmer to handle any of the messages that wish to be
@@ -128,6 +123,22 @@ BOOL    WINAPI DlgGetPassword(HWND, UINT, WPARAM, LPARAM);
 BOOL    WINAPI DlgInvalidPassword(HWND, UINT, WPARAM, LPARAM);
 DWORD   WINAPI HelpMessageFilterHookFunction(int, WORD, LPMSG);
 
+
+//*****************************************************************************
+//***********************   QUICK TIMER   A P I   *****************************
+//*****************************************************************************
+
+BOOL PASCAL SetQuickTimer(HWND hWnd, WORD wTimer, WORD wQuickTime);
+void PASCAL KillQuickTimer(void);
+
+//*****************************************************************************
+//*****************************************************************************
+
+extern int WINAPI GetSystemMetricsX(int);
+#define GetSystemMetrics  GetSystemMetricsX
+
+//*****************************************************************************
+
 /*
  * There are only three other points that should be of notice:
  * 1) The screen saver must have a string declared as 'szAppName' contaning the
@@ -144,6 +155,10 @@ DWORD   WINAPI HelpMessageFilterHookFunction(int, WORD, LPMSG);
 /* The following globals are defined in scrnsave.lib */
 extern HINSTANCE _cdecl hMainInstance;
 extern HWND _cdecl hMainWindow;
+extern HWND _cdecl hParentWindow;
+extern BOOL _cdecl fConfigure;
+extern BOOL _cdecl fPreview;
+extern BOOL _cdecl fInstall;
 extern char _cdecl szName[TITLEBARNAMELEN];
 extern char _cdecl szIsPassword[22];
 extern char _cdecl szIniFile[MAXFILELEN];
@@ -154,12 +169,11 @@ extern char _cdecl szChangePW[30];
 extern char _cdecl szBadOldPW[BUFFLEN];
 extern char _cdecl szHelpFile[MAXFILELEN];
 extern char _cdecl szNoHelpMemory[BUFFLEN];
-extern UINT _cdecl MyHelpMessage;
 extern HOOKPROC _cdecl fpMessageFilter;
 
 #ifdef __cplusplus
 }
-#endif	/* __cplusplus */
+#endif  /* __cplusplus */
 
 #ifndef RC_INVOKED
 #pragma pack()

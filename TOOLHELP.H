@@ -1,12 +1,21 @@
+/****************************************************************************
+*                                                                           *
+* THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY     *
+* KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE       *
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR     *
+* PURPOSE.                                                                  *
+*                                                                           *
+* Copyright (C) 1993-95  Microsoft Corporation.  All Rights Reserved.       *
+*                                                                           *
+****************************************************************************/
+
 /*****************************************************************************\
 *                                                                             *
 * toolhelp.h -  toolhelp.dll functions, types, and definitions                *
 *                                                                             *
-*               Version 1.0                                                   *
+* Version 1.0								      *
 *                                                                             *
-*               NOTE: windows.h must be #included first                       *
-*                                                                             *
-*               Copyright (c) 1992, Microsoft Corp.  All rights reserved.     *
+* NOTE: windows.h must be #included first				      *
 *                                                                             *
 \*****************************************************************************/
 
@@ -35,7 +44,9 @@ extern "C" {            /* Assume C declarations for C++ */
 
 /****** General symbols ******************************************************/
 #define MAX_DATA        11
-#define MAX_PATH        255
+
+#define MAX_PATH16      255
+
 #define MAX_MODULE_NAME 8 + 1
 #define MAX_CLASSNAME   255
 
@@ -166,7 +177,6 @@ typedef struct tagLOCALENTRY
 #define LT_USER_PALETTE             7
 #define LT_USER_ED                  8
 #define LT_USER_BWL                 9
-#define LT_USER_OWNERDRAW           10
 #define LT_USER_SPB                 11
 #define LT_USER_CHECKPOINT          12
 #define LT_USER_DCE                 13
@@ -176,16 +186,64 @@ typedef struct tagLOCALENTRY
 #define LT_USER_MISC                17
 #define LT_USER_ATOMS               18
 #define LT_USER_LOCKINPUTSTATE      19
-#define LT_USER_HOOKLIST            20
+#define LT_USER_HOOK                20
 #define LT_USER_USERSEEUSERDOALLOC  21
 #define LT_USER_HOTKEYLIST          22
 #define LT_USER_POPUPMENU           23
+#define LT_USER_ICON                24
+#define LT_USER_SUBSYSTEM           25
+#define LT_USER_QMSG                26
+#define LT_USER_VWININFO            27
+#define LT_USER_SMS                 28
+#define LT_USER_PROCESS             29
+#define LT_USER_ATTACHINFO          30
+#define LT_USER_SYSCOLORTEMP        31
 #define LT_USER_HANDLETABLE         32
-#define LT_USER_MAX                 LT_USER_HANDLETABLE
+#define LT_USER_SWITCHWNDINFO       33
+#define LT_USER_HOOKMSG             34
+#define LT_USER_MAX                 34
 
 BOOL    WINAPI LocalInfo(LOCALINFO FAR* lpLocal, HGLOBAL hHeap);
 BOOL    WINAPI LocalFirst(LOCALENTRY FAR* lpLocal, HGLOBAL hHeap);
 BOOL    WINAPI LocalNext(LOCALENTRY FAR* lpLocal);
+
+/****** Local 32-bit heap walking ********************************************/
+
+typedef HANDLE HLOCAL32;
+
+typedef struct tagLOCAL32INFO
+{
+    DWORD dwSize;
+    DWORD dwMemReserved;
+    DWORD dwMemCommitted;
+    DWORD dwTotalFree;
+    DWORD dwLargestFreeBlock;
+    DWORD dwcFreeHandles;
+} LOCAL32INFO;
+
+typedef struct tagLOCAL32ENTRY
+{
+    DWORD dwSize;
+    HLOCAL32 hHandle;
+    DWORD dwAddress;
+    DWORD dwSizeBlock;
+    WORD wFlags;
+    WORD wType;
+    WORD hHeap;
+    WORD wHeapType;
+    DWORD dwNext;
+    DWORD dwNextAlt;
+} LOCAL32ENTRY;
+
+/* LOCAL32ENTRY.wHeapType flags same as LOCALENTRY.wHeapType flags */
+
+/* LOCAL32ENTRY.wFlags same as LOCALENTRY.wFlags */
+
+/* LOCAL32ENTRY.wType same as LOCALENTRY.wType */
+
+BOOL    WINAPI Local32Info(LOCAL32INFO FAR* lpli32, HGLOBAL hHeap);
+BOOL    WINAPI Local32First(LOCAL32ENTRY FAR* lple32, HGLOBAL hHeap);
+BOOL    WINAPI Local32Next(LOCAL32ENTRY FAR* lple32);
 
 /****** Stack Tracing ********************************************************/
 
@@ -219,7 +277,7 @@ typedef struct tagMODULEENTRY
     char szModule[MAX_MODULE_NAME + 1];
     HMODULE hModule;
     WORD wcUsage;
-    char szExePath[MAX_PATH + 1];
+    char szExePath[MAX_PATH16 + 1];
     WORD wNext;
 } MODULEENTRY;
 
@@ -295,6 +353,9 @@ typedef struct tagSYSHEAPINFO
     WORD wGDIFreePercent;
     HGLOBAL hUserSegment;
     HGLOBAL hGDISegment;
+    HGLOBAL hWndSegment;
+    HGLOBAL hMenuSegment;
+    HGLOBAL hGDI32Segment;
 } SYSHEAPINFO;
 
 BOOL    WINAPI SystemHeapInfo(SYSHEAPINFO FAR* lpSysHeap);

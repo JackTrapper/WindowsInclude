@@ -1,12 +1,19 @@
+/****************************************************************************
+*                                                                           *
+* THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY     *
+* KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE       *
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR     *
+* PURPOSE.                                                                  *
+*                                                                           *
+* Copyright (C) 1993-95  Microsoft Corporation.  All Rights Reserved.       *
+*                                                                           *
+****************************************************************************/
+
 /*****************************************************************************\
 *                                                                             *
 * lzexpand.h    Public interfaces for LZEXPAND.DLL.                           *
 *                                                                             *
-*               Version 3.10                                                  *
-*                                                                             *
-*               NOTE: windows.h must be included first if LIB is NOT #defined *
-*                                                                             *
-*               Copyright (c) 1992, Microsoft Corp.  All rights reserved.     *
+* NOTE: windows.h must be included first if LIB is NOT #defined 	      *
 *                                                                             *
 *******************************************************************************
 *

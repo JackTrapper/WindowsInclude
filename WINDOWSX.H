@@ -1,10 +1,19 @@
+/****************************************************************************
+*                                                                           *
+* THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY     *
+* KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE       *
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR     *
+* PURPOSE.                                                                  *
+*                                                                           *
+* Copyright (C) 1993-95  Microsoft Corporation.  All Rights Reserved.       *
+*                                                                           *
+****************************************************************************/
+
 /*****************************************************************************\
 *                                                                             *
 * windowsx.h -  Macro APIs, window message crackers, and control APIs         *
 *                                                                             *
-*               Version 3.10                                                  *
-*                                                                             *
-*               Copyright (c) 1992, Microsoft Corp.  All rights reserved.     *
+* Version 3.10								      *
 *                                                                             *
 \*****************************************************************************/
 
@@ -594,7 +603,7 @@ extern "C" {            /* Assume C declarations for C++ */
 
 /* DWORD Cls_OnMenuChar(HWND hwnd, UINT ch, UINT flags, HMENU hmenu); */
 #define HANDLE_WM_MENUCHAR(hwnd, wParam, lParam, fn) \
-    (LRESULT)(DWORD)(fn)((hwnd), (UINT)(wParam), LOWORD(lParam), (HMENU)HIWORD(lParam));
+    (LRESULT)(DWORD)(fn)((hwnd), (UINT)(wParam), LOWORD(lParam), (HMENU)HIWORD(lParam))
 #define FORWARD_WM_MENUCHAR(hwnd, ch, flags, hmenu, fn) \
     (DWORD)(fn)((hwnd), WM_MENUCHAR, (WPARAM)(UINT)(ch), MAKELPARAM((flags), (UINT)(hmenu)))
 
@@ -674,13 +683,13 @@ extern "C" {            /* Assume C declarations for C++ */
 #define HANDLE_WM_PAINTCLIPBOARD(hwnd, wParam, lParam, fn) \
     ((fn)((hwnd), (HWND)(wParam), (const PAINTSTRUCT FAR*)GlobalLock((HGLOBAL)LOWORD(lParam))), GlobalUnlock((HGLOBAL)LOWORD(lParam)), 0L)
 #define FORWARD_WM_PAINTCLIPBOARD(hwnd, hwndCBViewer, lpPaintStruct, fn) \
-    (void)(fn)((hwnd), WM_PAINTCLIPBOARD, (WPARAM)(HWND)(hwndCBViewer), (LPARAM)(lpPaintStruct))
+    (void)(fn)((hwnd), WM_PAINTCLIPBOARD, (WPARAM)(HWND)(hwndCBViewer), (LPARAM)(LPPAINTSTRUCT)(lpPaintStruct))
 
 /* void Cls_OnSizeClipboard(HWND hwnd, HWND hwndCBViewer, const RECT FAR* lprc); */
 #define HANDLE_WM_SIZECLIPBOARD(hwnd, wParam, lParam, fn) \
     ((fn)((hwnd), (HWND)(wParam), (const RECT FAR*)GlobalLock((HGLOBAL)LOWORD(lParam))), GlobalUnlock((HGLOBAL)LOWORD(lParam)), 0L)
 #define FORWARD_WM_SIZECLIPBOARD(hwnd, hwndCBViewer, lprc, fn) \
-    (void)(fn)((hwnd), WM_SIZECLIPBOARD, (WPARAM)(HWND)(hwndCBViewer), (LPARAM)(lprc))
+    (void)(fn)((hwnd), WM_SIZECLIPBOARD, (WPARAM)(HWND)(hwndCBViewer), (LPARAM)(LPRECT)(lprc))
 
 /* void Cls_OnVScrollClipboard(HWND hwnd, HWND hwndCBViewer, UINT code, int pos); */
 #define HANDLE_WM_VSCROLLCLIPBOARD(hwnd, wParam, lParam, fn) \
@@ -708,7 +717,7 @@ extern "C" {            /* Assume C declarations for C++ */
 
 /* BOOL Cls_OnSetCursor(HWND hwnd, HWND hwndCursor, UINT codeHitTest, UINT msg); */
 #define HANDLE_WM_SETCURSOR(hwnd, wParam, lParam, fn) \
-    (LRESULT)(DWORD)(BOOL)(fn)((hwnd), (HWND)(wParam), (UINT)LOWORD(lParam), (UINT)HIWORD(lParam));
+    (LRESULT)(DWORD)(BOOL)(fn)((hwnd), (HWND)(wParam), (UINT)LOWORD(lParam), (UINT)HIWORD(lParam))
 #define FORWARD_WM_SETCURSOR(hwnd, hwndCursor, codeHitTest, msg, fn) \
     (BOOL)(DWORD)(fn)((hwnd), WM_SETCURSOR, (WPARAM)(HWND)(hwndCursor), MAKELPARAM((codeHitTest), (msg)))
 
@@ -722,7 +731,7 @@ extern "C" {            /* Assume C declarations for C++ */
 #define HANDLE_WM_MDICREATE(hwnd, wParam, lParam, fn) \
     (LRESULT)(DWORD)(UINT)(fn)((hwnd), (MDICREATESTRUCT FAR*)(lParam))
 #define FORWARD_WM_MDICREATE(hwnd, lpmcs, fn) \
-    (HWND)(UINT)(DWORD)(fn)((hwnd), WM_MDICREATE, 0, (LPARAM)(lpmcs))
+    (HWND)(UINT)(DWORD)(fn)((hwnd), WM_MDICREATE, 0, (LPARAM)(LPMDICREATESTRUCT)(lpmcs))
 
 /* void Cls_MDIDestroy(HWND hwnd, HWND hwndDestroy); */
 #define HANDLE_WM_MDIDESTROY(hwnd, wParam, lParam, fn) \
@@ -793,7 +802,7 @@ extern "C" {            /* Assume C declarations for C++ */
 
 /* BOOL Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam); */
 #define HANDLE_WM_INITDIALOG(hwnd, wParam, lParam, fn) \
-    (LRESULT)(DWORD)(UINT)(BOOL)(fn)((hwnd), (HWND)(wParam), lParam);
+    (LRESULT)(DWORD)(UINT)(BOOL)(fn)((hwnd), (HWND)(wParam), lParam)
 #define FORWARD_WM_INITDIALOG(hwnd, hwndFocus, lParam, fn) \
     (BOOL)(DWORD)(fn)((hwnd), WM_INITDIALOG, (WPARAM)(HWND)(hwndFocus), (lParam))
 
@@ -819,7 +828,7 @@ extern "C" {            /* Assume C declarations for C++ */
 #define HANDLE_WM_GETDLGCODE(hwnd, wParam, lParam, fn) \
     (LRESULT)(DWORD)(UINT)(fn)(hwnd, (MSG FAR*)(lParam))
 #define FORWARD_WM_GETDLGCODE(hwnd, lpmsg, fn) \
-    (UINT)(DWORD)(fn)((hwnd), WM_GETDLGCODE, (SELECTOROF(lpmsg) ? lpmsg->wParam : 0), (LPARAM)(lpmsg))
+    (UINT)(DWORD)(fn)((hwnd), WM_GETDLGCODE, (SELECTOROF(lpmsg) ? lpmsg->wParam : 0), (LPARAM)(LPMSG)(lpmsg))
 
 /* HBRUSH Cls_OnCtlColor(HWND hwnd, HDC hdc, HWND hwndChild, int type); */
 #define HANDLE_WM_CTLCOLOR(hwnd, wParam, lParam, fn) \
@@ -1032,6 +1041,8 @@ extern "C" {            /* Assume C declarations for C++ */
 #define ListBox_SetCaretIndex(hwndCtl, index)       ((int)(DWORD)SendMessage((hwndCtl), LB_SETCARETINDEX, (WPARAM)(int)(index), 0L))
 #define ListBox_GetCaretIndex(hwndCtl)              ((int)(DWORD)SendMessage((hwndCtl), LB_GETCARETINDEX, 0, 0L))
 
+#define ListBox_SetAnchorIndex(hwndCtl, index)      ((void)SendMessage((hwndCtl), LB_SETANCHORINDEX, (WPARAM)(int)(index), 0L))
+#define ListBox_GetAnchorIndex(hwndCtl)             ((int)(DWORD)SendMessage((hwndCtl), LB_GETANCHORINDEX, 0, 0L))
 
 #if (WINVER >= 0x030a)
 #define ListBox_FindStringExact(hwndCtl, indexStart, lpszFind) ((int)(DWORD)SendMessage((hwndCtl), LB_FINDSTRINGEXACT, (WPARAM)(int)(indexStart), (LPARAM)(LPCSTR)(lpszFind)))
@@ -1092,11 +1103,104 @@ extern "C" {            /* Assume C declarations for C++ */
 #define ComboBox_GetDroppedControlRect(hwndCtl, lprc) ((void)SendMessage((hwndCtl), CB_GETDROPPEDCONTROLRECT, 0, (LPARAM)(RECT FAR*)(lprc)))
 
 #define ComboBox_GetItemHeight(hwndCtl)             ((int)(DWORD)SendMessage((hwndCtl), CB_GETITEMHEIGHT, 0, 0L))
-#define ComboBox_SetItemHeight(hwndCtl, cyItem)     ((int)(DWORD)SendMessage((hwndCtl), CB_SETITEMHEIGHT, (WPARAM)(int)(index), 0L))
+#define ComboBox_SetItemHeight(hwndCtl, cyItem)     ((int)(DWORD)SendMessage((hwndCtl), CB_SETITEMHEIGHT, (WPARAM)(int)(index), (LPARAM)(int)cyItem))
 
 #define ComboBox_GetExtendedUI(hwndCtl)             ((UINT)(DWORD)SendMessage((hwndCtl), CB_GETEXTENDEDUI, 0, 0L))
 #define ComboBox_SetExtendedUI(hwndCtl, flags)      ((int)(DWORD)SendMessage((hwndCtl), CB_SETEXTENDEDUI, (WPARAM)(UINT)(flags), 0L))
 #endif  /* WINVER >= 0x030a */
+
+/****** Alternate porting layer macros ***************************************/
+
+/* USER MESSAGES: */
+
+#define GET_WPARAM(wp, lp)                      (wp)
+#define GET_LPARAM(wp, lp)                      (lp)
+
+#define GET_WM_ACTIVATE_STATE(wp, lp)           (wp)
+#define GET_WM_ACTIVATE_FMINIMIZED(wp, lp)      ((BOOL)HIWORD(lp))
+#define GET_WM_ACTIVATE_HWND(wp, lp)            ((HWND)LOWORD(lp))
+#define GET_WM_ACTIVATE_MPS(s, fmin, hwnd)      \
+        (WPARAM)(s), (LPARAM)MAKELONG(hwnd, fmin)
+
+#define GET_WM_CHARTOITEM_CHAR(wp, lp)          ((CHAR)wp)
+#define GET_WM_CHARTOITEM_POS(wp, lp)           HIWORD(lp)
+#define GET_WM_CHARTOITEM_HWND(wp, lp)          LOWORD(lp)
+#define GET_WM_CHARTOITEM_MPS(ch, pos, hwnd)    \
+        (WPARAM)ch, (LPARAM)MAKELONG(hwnd, pos)
+
+#define GET_WM_COMMAND_ID(wp, lp)               (wp)
+#define GET_WM_COMMAND_HWND(wp, lp)             (HWND)(LOWORD(lp))
+#define GET_WM_COMMAND_CMD(wp, lp)              HIWORD(lp)
+#define GET_WM_COMMAND_MPS(id, hwnd, cmd)    \
+        (WPARAM)id, MAKELONG(hwnd, cmd)
+
+#define GET_WM_CTLCOLOR_HDC(wp, lp, msg)        (HDC)(wp)
+#define GET_WM_CTLCOLOR_HWND(wp, lp, msg)       (HWND)(LOWORD(lp))
+#define GET_WM_CTLCOLOR_TYPE(wp, lp, msg)       HIWORD(lp)
+#define GET_WM_CTLCOLOR_MSG(type)               WM_CTLCOLOR
+#define GET_WM_CTLCOLOR_MPS(hdc, hwnd, type) \
+        (WPARAM)(hdc), (LPARAM)MAKELONG(hwnd, type)
+
+#define GET_WM_MENUSELECT_CMD(wp, lp)               (wp)
+#define GET_WM_MENUSELECT_FLAGS(wp, lp)             (UINT)LOWORD(lp)
+#define GET_WM_MENUSELECT_HMENU(wp, lp)             (HMENU)(HIWORD(lp))
+#define GET_WM_MENUSELECT_MPS(cmd, f, hmenu)  \
+        (WPARAM)cmd, (LPARAM)MAKELONG(f, hmenu)
+
+// Note: the following are for interpreting MDI child messages.
+#define GET_WM_MDIACTIVATE_FACTIVATE(hwnd, wp, lp)  (wp)
+#define GET_WM_MDIACTIVATE_HWNDDEACT(wp, lp)        (HWND)HIWORD(lp)
+#define GET_WM_MDIACTIVATE_HWNDACTIVATE(wp, lp)     (HWND)LOWORD(lp)
+// Note: the following is for sending to the MDI client window.
+#define GET_WM_MDIACTIVATE_MPS(f, hwndD, hwndA)\
+        (WPARAM)(hwndA), 0
+
+#define GET_WM_MDISETMENU_MPS(hmenuF, hmenuW)   \
+    (WPARAM)FALSE, (LPARAM)MAKELONG(hmenuF, hmenuW)
+
+#define GET_WM_MENUCHAR_CHAR(wp, lp)                (CHAR)(wp)
+#define GET_WM_MENUCHAR_HMENU(wp, lp)               (HMENU)HIWORD(lp)
+#define GET_WM_MENUCHAR_FMENU(wp, lp)               (BOOL)LOWORD(lp)
+#define GET_WM_MENUCHAR_MPS(ch, hmenu, f)    \
+        (WPARAM)ch, (LPARAM)MAKELONG(f, hmenu)
+
+#define GET_WM_PARENTNOTIFY_MSG(wp, lp)             (wp)
+#define GET_WM_PARENTNOTIFY_ID(wp, lp)              HIWORD(lp)
+#define GET_WM_PARENTNOTIFY_HWNDCHILD(wp, lp)       (HWND)LOWORD(lp)
+#define GET_WM_PARENTNOTIFY_X(wp, lp)               (int)LOWORD(lp)
+#define GET_WM_PARENTNOTIFY_Y(wp, lp)               (int)HIWORD(lp)
+#define GET_WM_PARENTNOTIFY_MPS(msg, id, hwnd) \
+        (WPARAM)msg, (LPARAM)MAKELONG(hwnd, id)
+#define GET_WM_PARENTNOTIFY2_MPS(msg, x, y) \
+        (WPARAM)msg, (LPARAM)MAKELONG(x, y)
+
+#define GET_WM_VKEYTOITEM_CODE(wp, lp)              (wp)
+#define GET_WM_VKEYTOITEM_ITEM(wp, lp)              HIWORD(lp)
+#define GET_WM_VKEYTOITEM_HWND(wp, lp)              (HWND)LOWORD(lp)
+#define GET_WM_VKEYTOITEM_MPS(code, item, hwnd) \
+        (WPARAM)code, (LPARAM)MAKELONG(hwnd, item)
+
+#define GET_EM_SETSEL_START(wp, lp)                 (int)LOWORD(lp)
+#define GET_EM_SETSEL_END(wp, lp)                   (int)HIWORD(lp)
+#define GET_EM_SETSEL_MPS(iStart, iEnd) \
+        (WPARAM)TRUE, MAKELONG(iStart, iEnd)
+
+#define GET_EM_LINESCROLL_MPS(vert, horz)     \
+        (WPARAM)0, (LPARAM)MAKELONG(vert, horz)
+
+#define GET_WM_CHANGECBCHAIN_HWNDNEXT(wp, lp)       (HWND)LOWORD(lp)
+
+#define GET_WM_HSCROLL_CODE(wp, lp)                 (wp)
+#define GET_WM_HSCROLL_POS(wp, lp)                  LOWORD(lp)
+#define GET_WM_HSCROLL_HWND(wp, lp)                 (HWND)HIWORD(lp)
+#define GET_WM_HSCROLL_MPS(code, pos, hwnd)    \
+        (WPARAM)code, (LPARAM)MAKELONG(pos, hwnd)
+
+#define GET_WM_VSCROLL_CODE(wp, lp)                 (wp)
+#define GET_WM_VSCROLL_POS(wp, lp)                  LOWORD(lp)
+#define GET_WM_VSCROLL_HWND(wp, lp)                 (HWND)HIWORD(lp)
+#define GET_WM_VSCROLL_MPS(code, pos, hwnd)    \
+        (WPARAM)code, (LPARAM)MAKELONG(pos, hwnd)
 
 #ifndef RC_INVOKED
 #pragma pack()          /* Revert to default packing */

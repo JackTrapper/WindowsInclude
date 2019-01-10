@@ -1,10 +1,19 @@
+/****************************************************************************
+*                                                                           *
+* THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY     *
+* KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE       *
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR     *
+* PURPOSE.                                                                  *
+*                                                                           *
+* Copyright (C) 1993-95  Microsoft Corporation.  All Rights Reserved.       *
+*                                                                           *
+****************************************************************************/
+
 /*****************************************************************************\
 *                                                                             *
 *  ddeml.h -    DDEML API header file                                         *
 *                                                                             *
-*               Version 1.0                                                   *
-*                                                                             *
-*               Copyright (c) 1992, Microsoft Corp.  All rights reserved.     *
+*  Version 1.0								      *
 *                                                                             *
 \*****************************************************************************/
 #ifndef _INC_DDEML
@@ -91,6 +100,8 @@ typedef struct tagCONVINFO
     UINT    wLastError;    /* last transaction error.  */
     HCONVLIST hConvList;   /* parent hConvList if this conversation is in a list */
     CONVCONTEXT ConvCtxt;  /* conversation context */
+    HWND    hwnd;          /* window handle for this conversation */
+    HWND    hwndPartner;   /* partner window handle for this conversation */
 } CONVINFO;
 typedef CONVINFO FAR *PCONVINFO;
 
