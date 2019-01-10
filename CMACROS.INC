@@ -1,5 +1,5 @@
 comment $
-cmacros - assembly macros for interfacing to hhls
+cmacros - assembly macros for interfacing to hlls
 (C)Copyright Microsoft Corp. 1984-1988
 $
 .xcref
@@ -71,10 +71,23 @@ sized= memL + memC + (memH*2)
 outif ?DF,0,<No segments or groups will be defined>
 outif ?TF,0,<Epilog sequences assume valid SP>
 outif ?WIN,1,<Windows support>
+ifdef PMODE
+?pmd=1
+??_out <! 286 protect mode>
+else
+?pmd=0
+endif
+ifdef ?386regs
+if ?386regs
+??_out <! 386 registers enabled>
+endif
+else
+?386regs=0
+endif
 if ?WIN eq 1
 outif ?PLM,1,<>
 else
-outif ?PLM,1,<PL/M calling convention>
+outif ?PLM,1,<Pascal calling convention>
 endif
 ifndef ?NODATA
 ?nodata1=0
@@ -104,10 +117,20 @@ endif
 else
 ASMpass=2
 endif
+ifdef ?pmd
+.286p
+endif
+if ?386regs
+.xcref ?n,?ax,?eax,?bx,?ebx
+.xcref ?cx,?ecx,?dx,?edx
+.xcref ?si,?esi,?di,?edi,?es,?ds,?fs
+.xcref ?gs
+else
 .xcref ?n,?ax,?ah,?al,?bx,?bh
 .xcref ?bl,?cx,?ch,?cl,?dx,?dh
 .xcref ?dl,?si,?di,?es,?ds,?bp
 .xcref ?sp,?ss,?cs
+endif
 .xcref ?rsl,?cpd,?argl,?argc,?ba
 .xcref ?acb,???,?po
 .xcref ?pas,?pc
@@ -116,7 +139,7 @@ endif
 .xcref ?ad,?ap,?atal,?dd,?dd1,?dd2
 .xcref ?pg,?pg1,?aloc,?cs1,?cs2
 .xcref ?DF,?TF,?ff,?PLM,?WIN,?ia,?pu,?adj
-.xcref ?uf,?rp,?nx,?nd,?nodata1,?chkstk1,?DOS5
+.xcref ?uf,?rp,?nx,?nd,?nodata1,?chkstk1,?DOS5,?pmd,?lds,?exp
 .xcref ?wfp,arg,cCall,cProc,assumes,?cs3,?cs2,?cs1
 .xcref defgrp,addseg,createSeg
 .xcref save,outif,errnz,errn$,errnz1
@@ -140,6 +163,8 @@ endif
 ?nd = 0
 ?nx = 0
 ?wfp = 0
+?lds = 0
+?exp = 0
 ?ff = 0
 ?dd2 = 0
 ?cCall1 = 0
@@ -149,6 +174,25 @@ endif
 if1
 ?casen = 0
 endif
+if ?386regs
+?n = 0000000000000000b
+?ax = 0000000000000001b
+?eax = 0000000000000010b
+?bx = 0000000000000100b
+?ebx = 0000000000001000b
+?cx = 0000000000010000b
+?ecx = 0000000000100000b
+?dx = 0000000001000000b
+?edx = 0000000010000000b
+?si = 0000000100000000b
+?esi = 0000001000000000b
+?di = 0000010000000000b
+?edi = 0000100000000000b
+?ds = 0001000000000000b
+?es = 0010000000000000b
+?fs = 0100000000000000b
+?gs = 1000000000000000b
+else
 ?n = 0000000000000000b
 ?ax = 0000000000000011b
 ?ah = 0000000000000001b
@@ -170,10 +214,20 @@ endif
 ?sp = 0010000000000000b
 ?ss = 0100000000000000b
 ?cs = 1000000000000000b
+endif
 .cref
 uconcat macro a,b,c,d,e,f,g
 a&b c&d e&f&g
 endm
+if ?386regs
+mpush macro r
+irp x,<ax,eax,bx,ebx,cx,ecx,dx,edx,si,esi,di,edi,ds,es,fs,gs>
+if (r and ?&&x)
+	push	x
+endif
+endm
+endm
+else
 mpush macro r
 irp x,<ax,bx,cx,dx,si,di,es,ds,bp,sp,ss,cs>
 if (r and ?&&x)
@@ -181,6 +235,16 @@ if (r and ?&&x)
 endif
 endm
 endm
+endif
+if ?386regs
+mpop macro r
+irp x,<gs,fs,es,ds,edi,di,esi,si,edx,dx,ecx,cx,ebx,bx,eax,ax>
+if (r and ?&&x)
+	pop	x
+endif
+endm
+endm
+else
 mpop macro r
 irp x,<cs,ss,sp,bp,ds,es,di,si,dx,cx,bx,ax>
 if (r and ?&&x)
@@ -188,15 +252,15 @@ if (r and ?&&x)
 endif
 endm
 endm
+endif
 save macro r
 ?rsl=0
 ?ri ?rsl,<r>
 endm
 ?ri macro n,r
 irp x,<r>
-ifdef ?&&x
+.ERRNDEF ?&&x
 n=n or ?&&x
-endif
 endm
 endm
 .xcref
@@ -282,6 +346,11 @@ purge ?PLMParm&cpc
 endif
 endm
 ifndef ?NOPARMR
+if ?pmd
+parmR macro n,r,r2
+??error <Sorry: ParmR can't be used with PMODE=1>
+endm
+else
 .xcref
 .xcref ?pr,parmR
 .cref
@@ -320,6 +389,7 @@ endm
 endif
 .cref
 endm
+endif
 endif
 .xcref
 .xcref localB,localW,localD,localQ,localT,localCP,localDP,localV
@@ -841,6 +911,8 @@ endif
 ?ff=0
 ?pas=0
 ?pcc=?PLM
+?lds=0
+?exp=0
 ifnb <a>
 ?ri ?pas,<a>
 endif
@@ -884,6 +956,12 @@ endif
 ifidn <x>,<NONWIN>
 ?wfp=0
 endif
+ifidn <x>,<LOADDS>
+?lds=1
+endif
+ifidn <x>,<EXPORTED>
+?exp=1
+endif
 endm
 if ?pcc
 ?PLMPrevParm=0
@@ -903,9 +981,11 @@ if (?nx eq 1) and (?nd eq 0)
 ??error <ATOMIC specified without NODATA - ATOMIC ignored>
 endif
 if ?pc
-if ?wfp
+if ?wfp+?exp+?lds
 ife ?nx
+ife ?pmd
 ?ia=2
+endif
 ?pas = ?pas and (not ?ds)
 endif
 endif
@@ -913,9 +993,15 @@ endif
 else
 ?wfp=0
 endif
+ife ?386regs
 ?pas = ?pas and (not (?sp+?cs+?ss))
+endif
 if ?uf
+if ?386regs
+?pas = ?pas and (not (?si+?di))
+else
 ?pas = ?pas and (not (?bp+?si+?di))
+endif
 endif
 ife ?pcc
 ?pg <_&n>,%?pu,%?pc,%?pas,%?wfp,<n>,%?pcc
@@ -968,7 +1054,43 @@ if ?uf
 ?mf c,%???,%?po
 mpush a
 else
-if w
+if w+?exp+?lds
+if ?pmd
+ife ?nd
+if ?lds
+mov ax,_DATA
+else
+if ?exp
+mov ax,ds
+nop
+endif
+endif
+endif
+ife ?nx
+if ???+?po
+if ?chkstk1
+push bp
+mov bp,sp
+else
+if ???
+enter ???,0
+else
+push bp
+mov bp,sp
+endif
+endif
+endif
+push ds
+if ?lds+?exp
+mov ds,ax
+endif
+else
+if ?ff+???+?po+?rp
+	push	bp
+	mov	bp,sp
+endif
+endif
+else
 ife ?nd
 	mov	ax,ds
 	nop
@@ -989,10 +1111,39 @@ endif
 ife ?nd
 	mov	ds,ax
 endif
+endif
+else
+if ?pmd
+if ?exp
+mov ax,ds
+nop
+else
+if ?lds
+mov ax,_DATA
+endif
+endif
+if ?ff+???+?po+?rp
+if ?chkstk1
+push bp
+mov bp,sp
+else
+if ???
+enter ???,0
+else
+push bp
+mov bp,sp
+endif
+endif
+endif
+if ?exp+?lds
+push ds
+mov ds,ax
+endif
 else
 if ?ff+???+?po+?rp
 	push	bp
 	mov	bp,sp
+endif
 endif
 endif
 if ?rp
@@ -1015,7 +1166,9 @@ else
 endif
 endif
 else
+ife ?pmd
 	sub	sp,???
+endif
 endif
 endif
 mpush a
@@ -1055,7 +1208,21 @@ mpop a
 if f
 	db	0c3h
 else
-if w
+if w+?exp+?lds
+if ?pmd
+ife ?nx
+pop ds
+endif
+ife ?nx
+if ?chkstk1+???+?po
+leave
+endif
+else
+if ?ff+???+?po+?rp
+leave
+endif
+endif
+else
 ife ?nx
 if (?TF eq 0) or (???+?rp)
 	lea	sp,-2[bp]
@@ -1073,12 +1240,19 @@ if ???+?po+?rp
 	pop	bp
 endif
 endif
+endif
+else
+if ?pmd
+if ?ff+???+?po+?rp
+leave
+endif
 else
 if ?ff+???+?po+?rp
 if (?TF eq 0) or (???+?rp)
 	mov	sp,bp
 endif
 	pop	bp
+endif
 endif
 endif
 ife cc
