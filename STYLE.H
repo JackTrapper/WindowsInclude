@@ -1,5 +1,6 @@
 /* Window styles */
 #define WS_TILED        0x00000000L
+#define WS_ICONICPOPUP  0xc0000000L
 #define WS_POPUP        0x80000000L
 #define WS_CHILD        0x40000000L
 #define WS_MINIMIZE     0x20000000L
@@ -7,6 +8,7 @@
 #define WS_DISABLED     0x08000000L
 #define WS_CLIPSIBLINGS 0x04000000L
 #define WS_CLIPCHILDREN 0x02000000L
+#define WS_MAXIMIZE     0x01000000L
 
 #define WS_BORDER       0x00800000L
 #define WS_CAPTION      0x00c00000L
@@ -30,6 +32,7 @@
 #define CS_CLASSDC      0x0040
 #define CS_MENUPOPUP    0x0080
 #define CS_NOKEYCVT     0x0100
+#define CS_SAVEBITS     0x0800
 
 /* Shorthand for the common cases */
 #define WS_TILEDWINDOW   (WS_TILED | WS_CAPTION | WS_SYSMENU | WS_SIZEBOX)
@@ -55,10 +58,14 @@
 #define BS_AUTO3STATE    6L
 #define BS_GROUPBOX      7L
 #define BS_USERBUTTON    8L
+#define BS_AUTORADIOBUTTON 9L
+#define BS_PUSHBOX       10L
+#define BS_LEFTTEXT      0x20L
 
 /* Dialog style bits */
 #define DS_ABSALIGN   0x000000001L
 #define DS_SYSMODAL   0x000000002L
+#define DS_LOCALEDIT  0x000000020L  /* Edit items get Local storage. */
 
 /* listbox style bits */
 #define LBS_NOTIFY        0x0001L
